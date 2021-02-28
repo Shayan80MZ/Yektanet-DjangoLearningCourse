@@ -5,5 +5,6 @@ from advertiser_management import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('show-ads/', views.showAds(), name='show-ads')
+    path('show-ads/', views.showAds(), name='show-ads'),
+    path('<int:pk>/', views.CountClickAndRedirect.as_view(), name='count-click')
 ]
