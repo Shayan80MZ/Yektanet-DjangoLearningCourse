@@ -1,6 +1,9 @@
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import RedirectView
+from django.views.generic import RedirectView, FormView
 from .models import Ad, Advertiser
+from .forms import AdForm
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 
 def showAds(request):
@@ -29,5 +32,22 @@ class CountClickAndRedirect(RedirectView):
         return ad.link
 
 
-def createAd():
-    pass
+class AdFormView(FormView):
+    form_class = AdForm
+    template_name = 'advertiser_management/form.html'
+
+    def form_valid(self, form):
+        advertiser_id = form.cleaned_data.get("advertiser_id")
+        image = form.cleaned_data.get("image")
+        title = form.cleaned_data.get("title")
+        link = form.cleaned_data.get("link")
+        ad = Ad.objects.create(
+            title=title,
+            imgUrl=image,
+            link=link,
+            advertiser=Advertiser.objects.get(pk=advertiser_id),
+            clicks=0,
+            views=0
+        )
+        ad.save()
+        return HttpResponseRedirect(reverse('show-ads'))
