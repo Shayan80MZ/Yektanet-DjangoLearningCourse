@@ -1,9 +1,10 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import RedirectView, FormView
-from .models import Ad, Advertiser
+from .models import Ad, Advertiser, View, Click
 from .forms import AdForm
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from datetime import datetime
 
 
 def showAds(request):
@@ -13,8 +14,12 @@ def showAds(request):
     # increase ads views
     ads = Ad.objects.all()
     for ad in ads:
-        ad.views += 1
-        ad.save()
+        view = View.objects.create(
+            view_date=datetime.now(),
+            user_ip=request.META['REMOTE_ADDR'],
+            ad=ad
+        )
+        view.save()
 
     return render(request, 'advertiser_management/ads.html', context)
 
@@ -26,8 +31,12 @@ class CountClickAndRedirect(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         ad = get_object_or_404(Ad, pk=kwargs['pk'])
-        ad.clicks += 1
-        ad.save()
+        click = Click.objects.create(
+            click_date=datetime.now(),
+            user_ip=self.request.META['REMOTE_ADDR'],
+            ad=ad
+        )
+        click.save()
         self.url = ad.link
         return ad.link
 
@@ -46,8 +55,6 @@ class AdFormView(FormView):
             image=image,
             link=link,
             advertiser=Advertiser.objects.get(pk=advertiser_id),
-            clicks=0,
-            views=0
         )
         ad.save()
         return HttpResponseRedirect(reverse('show-ads'))
