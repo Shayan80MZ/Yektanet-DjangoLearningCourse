@@ -8,7 +8,7 @@ from django.urls import reverse
 
 def showAds(request):
     advertisers = Advertiser.objects.all()
-    context = {"advertisers_list": advertisers}
+    context = {"advertisers": advertisers}
 
     # increase ads views
     ads = Ad.objects.all()
@@ -43,7 +43,7 @@ class AdFormView(FormView):
         link = form.cleaned_data.get("link")
         ad = Ad.objects.create(
             title=title,
-            imgUrl=image,
+            image=image,
             link=link,
             advertiser=Advertiser.objects.get(pk=advertiser_id),
             clicks=0,

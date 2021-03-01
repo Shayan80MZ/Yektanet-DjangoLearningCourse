@@ -12,7 +12,7 @@ class Advertiser(models.Model):
 
 class Ad(models.Model):
     title = models.CharField(max_length=100)
-    imgUrl = models.ImageField()
+    image = models.ImageField()
     link = models.URLField()
     clicks = models.IntegerField(default=0)
     views = models.IntegerField(default=0)
