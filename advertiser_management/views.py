@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import RedirectView, FormView
+from django.views.generic import RedirectView, FormView, base
 from .models import Ad, Advertiser, View, Click
 from .forms import AdForm
 from django.http import HttpResponseRedirect
@@ -7,21 +7,40 @@ from django.urls import reverse
 from datetime import datetime
 
 
-def showAds(request):
-    advertisers = Advertiser.objects.all()
-    context = {"advertisers": advertisers}
+# def showAds(request):
+#     advertisers = Advertiser.objects.all()
+#     context = {"advertisers": advertisers}
+#
+#     # increase ads views
+#     ads = Ad.objects.all()
+#     for ad in ads:
+#         view = View.objects.create(
+#             view_date=datetime.now(),
+#             user_ip=request.META['REMOTE_ADDR'],
+#             ad=ad
+#         )
+#         view.save()
+#
+#     return render(request, 'advertiser_management/ads.html', context)
 
-    # increase ads views
-    ads = Ad.objects.all()
-    for ad in ads:
-        view = View.objects.create(
-            view_date=datetime.now(),
-            user_ip=request.META['REMOTE_ADDR'],
-            ad=ad
-        )
-        view.save()
+class ShowAds(base.TemplateView):
+    template_name = 'advertiser_management/ads.html'
 
-    return render(request, 'advertiser_management/ads.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['advertisers'] = Advertiser.objects.all()
+
+        # increase ads views
+        ads = Ad.objects.all()
+        for ad in ads:
+            view = View.objects.create(
+                view_date=datetime.now(),
+                user_ip=self.request.META['REMOTE_ADDR'],
+                ad=ad
+            )
+            view.save()
+
+        return context
 
 
 class CountClickAndRedirect(RedirectView):
