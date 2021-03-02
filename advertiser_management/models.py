@@ -7,6 +7,11 @@ class Advertiser(models.Model):
     def __str__(self):
         return self.name
 
+    def getApprovedAds(self):
+        for ad in self.ad_set.all():
+            if ad.approve:
+                yield ad
+
 
 class Ad(models.Model):
     title = models.CharField(max_length=100)
