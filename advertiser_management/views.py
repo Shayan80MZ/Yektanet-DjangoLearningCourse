@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import RedirectView, FormView, base
+from django.views.generic import RedirectView, FormView, base, DetailView
 from .models import Ad, Advertiser, View, Click
 from .forms import AdForm
 from django.http import HttpResponseRedirect
@@ -77,3 +77,8 @@ class AdFormView(FormView):
         )
         ad.save()
         return HttpResponseRedirect(reverse('show-ads'))
+
+
+class AdDetail(DetailView):
+    model = Ad
+    template_name = 'advertiser_management/ad-detail.html'
