@@ -41,10 +41,17 @@ class CreateAdView(viewsets.GenericViewSet, CreateModelMixin):
     permission_classes = [IsAuthenticated, ]
 
 
-class EditAdView(viewsets.GenericViewSet, RetrieveModelMixin):
+class EditAdView(viewsets.GenericViewSet, UpdateModelMixin):
     serializer_class = AdSerializer
     queryset = Ad.objects.all()
     authentication_classes =[TokenAuthentication, ]
+    permission_classes = [IsAuthenticated, IsAdAdvertiser]
+
+
+class ShowAdView(viewsets.GenericViewSet, RetrieveModelMixin):
+    serializer_class = AdSerializer
+    queryset = Ad.objects.all()
+    authentication_classes = [TokenAuthentication, ]
     permission_classes = [IsAuthenticated, IsAdAdvertiser]
 
 

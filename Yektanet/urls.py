@@ -9,6 +9,7 @@ router = routers.DefaultRouter()
 router.register(r'register-advertiser', views.RegisterAdvertiserView, basename='register-advertiser')
 router.register(r'create-ad', views.CreateAdView, basename='create-ad')
 router.register(r'edit-ad', views.EditAdView, basename='edit-ad')
+router.register(r'show-ad', views.ShowAdView, basename='show-ad')
 router.register(r'ad-clicks', views.AdClicksView, basename='ad-clicks')
 router.register(r'ad-views', views.AdViewsView, basename='ad-views')
 
