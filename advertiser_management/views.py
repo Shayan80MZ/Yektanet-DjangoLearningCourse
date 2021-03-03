@@ -6,79 +6,77 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from datetime import datetime
 
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.response import Response
+from rest_framework import generics, viewsets, status
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.generics import CreateAPIView, RetrieveAPIView, ListAPIView
+from rest_framework.mixins import *
+from .serializers import *
+from .permissions import *
 
-# def showAds(request):
-#     advertisers = Advertiser.objects.all()
-#     context = {"advertisers": advertisers}
+
+# @api_view(["POST"])
+# @permission_classes((AllowAny,))
+# def registerAdvertiserView(request):
+#     try:
+#             name = request.data.get("name")
+#             user = User.objects.create(username=name)
+#             token = Token.objects.create(user=user).key
+#             advertiser =Advertiser(name=name, user=user)
+#             advertiser.save()
 #
-#     # increase ads views
-#     ads = Ad.objects.all()
-#     for ad in ads:
-#         view = View.objects.create(
-#             view_date=datetime.now(),
-#             user_ip=request.META['REMOTE_ADDR'],
-#             ad=ad
-#         )
-#         view.save()
-#
-#     return render(request, 'advertiser_management/ads.html', context)
+#             return Response({'token': token}, status=status.HTTP_200_OK)
+#     except:
+#             return Response({'error': 'An error has occurred'}, status=status.HTTP_400_BAD_REQUEST)
 
-class ShowAds(base.TemplateView):
-    template_name = 'advertiser_management/ads.html'
+class RegisterAdvertiserView(viewsets.GenericViewSet, CreateModelMixin):
+    serializer_class = AdvertiserSerializer
+    queryset = Advertiser.objects.all()
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['advertisers'] = Advertiser.objects.all()
+    def create(self, request, *args, **kwargs):
+        name = request.data.get("name")
+        user = User.objects.create(username=name)
+        token = Token.objects.create(user=user).key
+        advertiser = Advertiser(name=name, user=user)
+        advertiser.save()
 
-        # increase ads views
-        ads = Ad.objects.all()
-        for ad in ads:
-            view = View.objects.create(
-                view_date=datetime.now(),
-                user_ip=self.request.META['REMOTE_ADDR'],
-                ad=ad
-            )
-            view.save()
-
-        return context
+        return Response({'token': token}, status=status.HTTP_200_OK)
 
 
-class CountClickAndRedirect(RedirectView):
-    permanent = False
-    query_string = True
-    pattern_name = 'count-click'
-
-    def get_redirect_url(self, *args, **kwargs):
-        ad = get_object_or_404(Ad, pk=kwargs['pk'])
-        click = Click.objects.create(
-            click_date=datetime.now(),
-            user_ip=self.request.META['REMOTE_ADDR'],
-            ad=ad
-        )
-        click.save()
-        self.url = ad.link
-        return ad.link
+class CreateAdView(viewsets.GenericViewSet, CreateModelMixin):
+    serializer_class = AdSerializer
+    queryset = Ad.objects.all()
+    authentication_classes =[TokenAuthentication, ]
+    permission_classes = [IsAuthenticated, ]
 
 
-class AdFormView(FormView):
-    form_class = AdForm
-    template_name = 'advertiser_management/form.html'
-
-    def form_valid(self, form):
-        advertiser_id = form.cleaned_data.get("advertiser_id")
-        image = form.cleaned_data.get("image")
-        title = form.cleaned_data.get("title")
-        link = form.cleaned_data.get("link")
-        ad = Ad.objects.create(
-            title=title,
-            image=image,
-            link=link,
-            advertiser=Advertiser.objects.get(pk=advertiser_id),
-        )
-        ad.save()
-        return HttpResponseRedirect(reverse('show-ads'))
+class EditAdView(viewsets.GenericViewSet, RetrieveModelMixin):
+    serializer_class = AdSerializer
+    queryset = Ad.objects.all()
+    authentication_classes =[TokenAuthentication, ]
+    permission_classes = [IsAuthenticated, IsAdAdvertiser]
 
 
-class AdDetail(DetailView):
-    model = Ad
-    template_name = 'advertiser_management/ad-detail.html'
+class AdClicksView(viewsets.GenericViewSet, ListModelMixin):
+    serializer_class = ClickSerializer
+    queryset = Click.objects.all()
+    authentication_classes = [TokenAuthentication, ]
+    permission_classes = [IsAuthenticated, IsAdAdvertiser]
+
+    def get_queryset(self):
+        return Click.objects.filter(ad__advertiser__name=self.request.user.username)
+
+
+class AdViewsView(viewsets.GenericViewSet, ListModelMixin):
+    serializer_class = ViewSerializer
+    queryset = View.objects.all()
+    authentication_classes = [TokenAuthentication, ]
+    permission_classes = [IsAuthenticated, IsAdAdvertiser]
+
+    def get_queryset(self):
+        return View.objects.filter(ad__advertiser__name=self.request.user.username)

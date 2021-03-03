@@ -1,9 +1,11 @@
 from django.db import models
 from collections import OrderedDict
+from django.contrib.auth.models import User
 
 
 class Advertiser(models.Model):
     name = models.CharField(max_length=100)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.name
