@@ -20,20 +20,6 @@ from .serializers import *
 from .permissions import *
 
 
-# @api_view(["POST"])
-# @permission_classes((AllowAny,))
-# def registerAdvertiserView(request):
-#     try:
-#             name = request.data.get("name")
-#             user = User.objects.create(username=name)
-#             token = Token.objects.create(user=user).key
-#             advertiser =Advertiser(name=name, user=user)
-#             advertiser.save()
-#
-#             return Response({'token': token}, status=status.HTTP_200_OK)
-#     except:
-#             return Response({'error': 'An error has occurred'}, status=status.HTTP_400_BAD_REQUEST)
-
 class RegisterAdvertiserView(viewsets.GenericViewSet, CreateModelMixin):
     serializer_class = AdvertiserSerializer
     queryset = Advertiser.objects.all()
