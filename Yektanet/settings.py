@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'advertiser_management.apps.AdvertiserManagementConfig',
     'rest_framework.authtoken',
-    'rest_framework'
+    'rest_framework',
+    'django_celery_beat'
 ]
 
 REST_FRAMEWORK = {
