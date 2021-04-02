@@ -76,3 +76,15 @@ class Click(models.Model):
 
     def __str__(self):
         return self.ad.title + " clicked by " + self.user_ip
+
+
+class HourlyData(models.Model):
+    ad = models.OneToOneField(Ad, on_delete=models.CASCADE)
+    clicksNum = models.IntegerField()
+    viewsNum = models.IntegerField()
+
+
+class DailyData(models.Model):
+    ad = models.OneToOneField(Ad, on_delete=models.CASCADE)
+    clicksNum = models.IntegerField()
+    viewsNum = models.IntegerField()
