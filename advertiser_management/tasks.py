@@ -8,7 +8,7 @@ def saveHourlyTask():
     for ad in Ad.objects.all():
         clickNum = ad.click_set.filter(click_date__gte=datetime.now().replace(hour=datetime.now().hour - 1)).count()
         viewNum = ad.view_set.filter(view_date__gte=datetime.now().replace(hour=datetime.now().hour - 1)).count()
-        HourlyData.objects.create(ad=ad, clicksNum=clickNum, viewsNum=viewNum)
+        HourlyData.objects.create(ad=ad, clicksNum=clickNum, viewsNum=viewNum, date=datetime.now())
 
 
 @task(name='daily_task')
@@ -16,4 +16,4 @@ def saveDailyTask():
     for ad in Ad.objects.all():
         clickNum = ad.click_set.filter(click_date__gte=datetime.now().replace(day=datetime.now().day - 1)).count()
         viewNum = ad.view_set.filter(view_date__gte=datetime.now().replace(day=datetime.now().day - 1)).count()
-        DailyData.objects.create(ad=ad, clicksNum=clickNum, viewsNum=viewNum)
+        DailyData.objects.create(ad=ad, clicksNum=clickNum, viewsNum=viewNum, date=datetime.now())

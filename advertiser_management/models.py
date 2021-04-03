@@ -82,9 +82,11 @@ class HourlyData(models.Model):
     ad = models.OneToOneField(Ad, on_delete=models.CASCADE)
     clicksNum = models.IntegerField()
     viewsNum = models.IntegerField()
+    date = models.DateTimeField()
 
 
 class DailyData(models.Model):
     ad = models.OneToOneField(Ad, on_delete=models.CASCADE)
     clicksNum = models.IntegerField()
     viewsNum = models.IntegerField()
+    date = models.DateTimeField()
